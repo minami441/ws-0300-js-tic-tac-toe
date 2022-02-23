@@ -2,86 +2,81 @@ const buttons = document.querySelectorAll('.cell');
 const restart = document.querySelector('.js-restart');
 const turnitem = document.querySelectorAll('.turn-item');
 const stms=document.querySelector('.js-state-message');
+const piece={
+    batu:'×',
+    maru: '○'
+};
+const cells= new Array(9)
+const win_patterns = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+]
 
-var count=1;
-var tmp;
-var fin;
+let count=1;
+let fin;
 
 
 buttons.forEach(function(target) {
-    
     target.addEventListener('click', function() {
-        
-        if(target.innerText!="" || fin==1)return;
+        if(target.innerText!="" || fin===true)return;
 
+        //番号取得
+        const index = Number(target.getAttribute('data-key')) - 1
+        
         //○、×判定
-        if(count%2==0){
-            tmp='○'
-            turnitem[0].classList.remove("active");
-            turnitem[1].classList.add("active");
-        }else{
-            tmp='×'
+        if(count%2 == 0){
+            cells[index] = piece['batu'];
             turnitem[1].classList.remove("active");
             turnitem[0].classList.add("active");
+        }else{
+            cells[index] = piece['maru'];
+            turnitem[0].classList.remove("active");
+            turnitem[1].classList.add("active");
         }
 
         //○×表記
-        target.innerText=tmp
+        target.innerText=cells[index]
 
-        //couner+1
-        count=count+1;
-
-        if(judge(buttons,tmp)=='win'){
-            stms.innerText=tmp+' win!!';
-            fin=1;
-        }else if(judge(buttons,tmp)=='draw'){
+        if(judge()===true){
+            stms.innerText=cells[index]+' win!!';
+            fin=true;
+        }else if(count==9){
             stms.innerText='draw';
-            fin=1;
+            fin=true;
         }
         
-
+        //couner+1
+        count=count+1;
 
 
     }, false);
     
 });
 
-function judge(buttons,tmp){
+function judge(){
+   return win_patterns.some(pattern => {
+       const one   = cells[pattern[0]]
+       const two   = cells[pattern[1]]
+       const three = cells[pattern[2]]
+       
+       return one && one === two && one === three
+    });
     
-    const map =new Map();
-    var t=0;
-    var draw=0;
-
-    map.set("1",[buttons[0].innerText,buttons[1].innerText,buttons[2].innerText]);
-    map.set("2",[buttons[3].innerText,buttons[4].innerText,buttons[5].innerText]);
-    map.set("3",[buttons[6].innerText,buttons[7].innerText,buttons[8].innerText]);
-    map.set("4",[buttons[0].innerText,buttons[3].innerText,buttons[6].innerText]);
-    map.set("5",[buttons[1].innerText,buttons[4].innerText,buttons[7].innerText]);
-    map.set("6",[buttons[2].innerText,buttons[5].innerText,buttons[8].innerText]);
-    map.set("7",[buttons[0].innerText,buttons[4].innerText,buttons[8].innerText]);
-    map.set("8",[buttons[2].innerText,buttons[4].innerText,buttons[6].innerText]);
-
-
-    map.forEach(
-        function( value ,key  ){
-            if(value.some(value=>value=="")){
-                draw=1;
-            }
-            if(value.every(value=>value!="" && value==tmp)){
-                t=1;       
-            }
-        }
-    );
-    
-    if(t==1)return 'win';
-    if(draw==0)return 'draw';
 }
 
 restart.addEventListener('click', function() {
     buttons.forEach(function(e) {
         e.innerText="";
     })
-    turnitem[1].classList.remove("active");
-    turnitem[0].classList.add("active");
+        turnitem[1].classList.remove("active");
+        turnitem[0].classList.add("active");
+        count=1;
+        fin=false;
+        stms.innerText="starting...";
 });
-
