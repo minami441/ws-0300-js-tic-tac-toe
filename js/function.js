@@ -30,7 +30,7 @@ buttons.forEach(function(target) {
         const index = Number(target.getAttribute('data-key')) - 1
         
         //○、×判定
-        if(count%2 == 0){
+        if(count%2 === 0){
             cells[index] = piece['batu'];
             turnitem[1].classList.remove("active");
             turnitem[0].classList.add("active");
@@ -78,5 +78,6 @@ restart.addEventListener('click', function() {
         turnitem[0].classList.add("active");
         count=1;
         fin=false;
+        cells.length=0;
         stms.innerText="starting...";
 });
